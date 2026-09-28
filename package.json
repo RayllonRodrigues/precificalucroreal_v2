@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
-    "start": "node --import ./scripts/node-runtime.mjs .output/server/index.mjs",
+    "start": "node .output/server/index.mjs",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "test:security:unit": "tsx --test tests/*.test.ts",
