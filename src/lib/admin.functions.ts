@@ -3,6 +3,7 @@ import type { Database } from "@/integrations/supabase/types";
 import { findUniqueAccountByEmail } from "./admin-email";
 import { cadastroPermitido } from "./signup-policy";
 import { companyExpirationStore, extendExpiration } from "./license-extension";
+import { paymentAdminStatus, savePaymentAdmin } from "./admin-payment-contract";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -493,8 +494,7 @@ export const obterConfigPagamento = createServerFn({ method: "POST" })
       .eq("id", true)
       .maybeSingle();
     return {
-      mercadopagoAtivo: secrets?.mercadopago_ativo ?? false,
-      tokenConfigurado: !!(secrets?.mercadopago_access_token ?? "").trim(),
+      ...paymentAdminStatus(secrets),
       precoLicenca: Number(settings?.preco_licenca ?? 129.9),
       mesesLicenca: Number(settings?.meses_licenca ?? 12),
       diasTeste: Number(settings?.dias_teste ?? 30),
@@ -515,27 +515,26 @@ export const salvarConfigPagamento = createServerFn({ method: "POST" })
       .parse(data),
   )
   .handler(async ({ data, context }) => {
-    await exigirAdmin(context);
-    const db = await admin();
-
-    const secrets: Record<string, unknown> = {
-      id: true,
-      mercadopago_ativo: data.mercadopagoAtivo,
-      updated_at: new Date().toISOString(),
-    };
-    if (data.token) secrets["mercadopago_access_token"] = data.token;
-
-    const { error: erroSecret } = await db.from("platform_secrets").upsert(secrets as never);
-    if (erroSecret) throw new Error("Não foi possível salvar a credencial de pagamento.");
-
-    const { error } = await db.from("platform_settings").upsert({
-      id: true,
-      preco_licenca: data.precoLicenca,
-      meses_licenca: data.mesesLicenca,
-      dias_teste: data.diasTeste,
-    } as never);
-    if (error) throw new Error("Não foi possível salvar o plano da licença.");
-    return { ok: true as const };
+    return savePaymentAdmin(data, {
+      authorize: () => exigirAdmin(context),
+      hasToken: async () => {
+        const db = await admin();
+        const { data: stored, error } = await db.from("platform_secrets")
+          .select("mercadopago_access_token").eq("id", true).maybeSingle();
+        if (error) throw new Error("Configuration read failed");
+        return Boolean(stored?.mercadopago_access_token?.trim() || process.env["MERCADO_PAGO_ACCESS_TOKEN"]?.trim());
+      },
+      saveSecret: async (value) => {
+        const db = await admin();
+        const { error } = await db.from("platform_secrets").upsert(value);
+        if (error) throw new Error("Secret write failed");
+      },
+      saveSettings: async (value) => {
+        const db = await admin();
+        const { error } = await db.from("platform_settings").upsert(value);
+        if (error) throw new Error("Settings write failed");
+      },
+    });
   });
 
 /** Concede manualmente uma licença à empresa, a partir de hoje ou do vencimento atual. */

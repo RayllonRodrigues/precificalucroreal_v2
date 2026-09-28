@@ -1,0 +1,26 @@
+{
+  "viteSecretVariables": 0,
+  "clientFilesWithSecretValues": 0,
+  "clientFilesWithServerSecretReferences": 0,
+  "appIsLocal": true,
+  "appUrlAllowlisted": true,
+  "environment": "sandbox",
+  "testEmailPresent": false,
+  "settings": [
+    {
+      "permitir_cadastros": false
+    }
+  ],
+  "payment": [
+    {
+      "mercadopago_ativo": false,
+      "token_present": false
+    }
+  ],
+  "counts": [
+    {
+      "users": 0,
+      "profiles": 0
+    }
+  ]
+}

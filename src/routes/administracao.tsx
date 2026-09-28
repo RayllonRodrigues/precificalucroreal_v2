@@ -1064,7 +1064,7 @@ function PagamentosSecao() {
         <div>
           <p className="text-sm font-semibold">Mercado Pago</p>
           <p className="text-xs text-slate-400">
-            Cole a credencial de produção (Access Token) da conta que vai receber os pagamentos.
+            Configure o Access Token correspondente ao ambiente de pagamento definido para a aplicação.
           </p>
         </div>
 
@@ -1077,6 +1077,9 @@ function PagamentosSecao() {
 
         <div className="space-y-1.5">
           <Label htmlFor="mp-token">Access Token</Label>
+          <p className="text-xs text-slate-500">
+            {config.data?.tokenConfigurado ? "Configurado" : "Não configurado"}
+          </p>
           <Input
             id="mp-token"
             type="password"
@@ -1085,7 +1088,7 @@ function PagamentosSecao() {
             placeholder={
               config.data?.tokenConfigurado
                 ? "Credencial salva — digite para substituir"
-                : "APP_USR-..."
+                : "Cole o Access Token"
             }
             value={atual.token}
             onChange={(e) => set({ token: e.target.value })}

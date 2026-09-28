@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "tests": [
+    "real non-admin authorization and direct secret table privileges denied",
+    "real platform admin saves credential; response exposes status only",
+    "empty preserves; explicit replacement updates"
+  ],
+  "rolledBack": true
+}

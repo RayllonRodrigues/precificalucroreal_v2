@@ -109,7 +109,7 @@ export const criarPagamentoLicenca = createServerFn({ method: "POST" })
     });
 
     if (!resposta.ok) {
-      console.error("Mercado Pago:", resposta.status, await resposta.text());
+      console.error("Mercado Pago preference failed:", resposta.status);
       throw new Error("Não foi possível abrir o pagamento. Tente novamente em instantes.");
     }
 

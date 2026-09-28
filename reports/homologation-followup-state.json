@@ -1,0 +1,37 @@
+{
+  "project": "adkfebcanubebtmqyram",
+  "at": "2026-09-28T16:42:12.493Z",
+  "baselineUnchanged": true,
+  "recoveryMigrationsUnchanged": true,
+  "counts": [
+    {
+      "auth_users": 0,
+      "profiles": 0,
+      "companies": 0,
+      "payments": 0,
+      "logos": 0,
+      "cleanup_jobs": 0
+    }
+  ],
+  "settings": [
+    {
+      "permitir_cadastros": false,
+      "permitir_demo": false,
+      "dias_teste": 30
+    }
+  ],
+  "prerequisites": {
+    "managementToken": "AUSENTE",
+    "mpToken": "AUSENTE",
+    "mpWebhook": "AUSENTE",
+    "mpEnvironment": "sandbox",
+    "appIsLocal": true
+  },
+  "authHookAccess": {
+    "cli": "ConfigDiffReadStatusError",
+    "managementApi": "NO_TOKEN",
+    "integration": "PERMISSION_DENIED",
+    "configPushExecuted": false
+  },
+  "schemaChanges": false
+}

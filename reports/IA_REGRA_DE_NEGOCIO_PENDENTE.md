@@ -24,7 +24,7 @@ Não foram encontradas chamadas `.rpc("consume_ai_rate_limit")` no frontend ou n
 | --- | --- | --- |
 | Unidade | Uma operação lógica de geração, identificada por request_id; retry da mesma operação não consome novamente | Confirmar se cobrança é por chamada, geração concluída ou tokens/custo |
 | Escopo | company_id verificado no servidor, nunca um contador por navegador/usuário | Confirmar compartilhamento da cota entre membros e tratamento de múltiplas empresas |
-| Janela | Janela fixa parametrizada, limites temporais calculados no banco em UTC | Aprovar duração, calendário versus ciclo de licença e quantidade permitida; nenhum número adotado |
+| Janela | Sugestão para avaliação: janela diária em UTC, de 00:00 até 00:00 do dia seguinte; ciclo de licença é alternativa se a cota for comercial mensal | Aprovar duração, calendário versus ciclo de licença e quantidade permitida; nenhuma janela nem quantidade adotada no código |
 | Reset | Mudança de window_start cria uma nova janela; não zerar contadores por cron | Aprovar se há acúmulo, prorrata ou migração de plano no meio da janela |
 | Concorrência | Reserva atômica condicionada a remaining > 0, com unique(company_id,window_start) e request_id único por operação | Aprovar quando reservar/consumir e quando liberar uma reserva |
 | Persistência | Registro privado de janela/consumo e registro de requisições idempotentes; nenhuma escrita pelo browser | Aprovar retenção e trilha de auditoria; não armazenar prompts/secrets sem necessidade |

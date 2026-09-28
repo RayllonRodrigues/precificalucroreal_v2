@@ -1,5 +1,150 @@
 # Baseline e validação de homologação — 28/09/2026
 
+## Atualização atual: signup parametrizado e configuração administrativa
+
+Nenhuma alteração de schema, RLS ou RPC; nenhuma migration reaplicada; produção não acessada.
+
+| Item | Estado atual |
+| --- | --- |
+| Auth Hook remoto | **APROVADO** — ativação e confirmação remota registradas anteriormente |
+| Signup bloqueado | **APROVADO** — HTTP 403, sem usuário/profile órfão |
+| Signup habilitado | **PENDENTE** — HOMOLOGATION_TEST_EMAIL ausente |
+| Configuração administrativa Mercado Pago | **APROVADA** no código e testes locais/integrados descritos abaixo |
+| Pagamento sandbox externo | **ADIADO** por decisão do usuário |
+| IA | **REGRA DE NEGÓCIO PENDENTE** |
+| Storage scheduler | **PENDÊNCIA OPERACIONAL** |
+| URL pública Railway | **PENDENTE** — APP_URL continua local |
+
+### Teste de signup preparado
+
+`scripts/test-homologation-signup.mjs` lê `HOMOLOGATION_TEST_EMAIL` e opcionalmente
+`HOMOLOGATION_TEST_PASSWORD`. Sem email, registra PENDENTE e não abre cadastro.
+Sem senha informada, gera uma senha forte somente em memória, sem imprimi-la.
+Não inventa endereço nem reutiliza usuário existente: se o email já existir, recusa o teste.
+
+Quando há email, o runner valida o destino e o Hook por config diff antes de habilitar
+temporariamente cadastro. Faz signup público, verifica Auth/profile/metadata, aguarda
+confirmação real por email e testa login/sessão. Não usa auto-confirmação administrativa
+para fazer o teste passar.
+
+Depois solicita recuperação pelo Auth hospedado. Para completar a redefinição,
+`HOMOLOGATION_RECOVERY_LINK_FILE` pode apontar para um arquivo local temporário que
+receberá o link efetivamente entregue por email. O runner aceita somente link recovery
+do Supabase de homologação, verifica o token pelo Auth, redefine a senha e testa novo
+login. Não imprime link, token, senha, email ou sessão. Sem esse link, a recuperação
+completa fica PENDENTE, nunca é reportada como aprovada por simulação.
+
+O timeout padrão de confirmação/recuperação é 120 segundos, configurável por
+`HOMOLOGATION_TEST_WAIT_SECONDS` até 600 segundos. Em finalização normal, erro, SIGINT
+ou SIGTERM tratado, fecha os cadastros antes de limpar o usuário marcado por um ID
+único de execução e verifica remoção do profile. Como qualquer processo, não pode
+executar finally após encerramento forçado do sistema/SIGKILL; se isso ocorrer,
+é necessária conferência operacional de permitir_cadastros e limpeza pelo ID da execução.
+
+Exemplo sem gravar nem mostrar senha:
+
+```powershell
+$env:HOMOLOGATION_TEST_EMAIL = Read-Host "Email dedicado de testes sob seu controle"
+# Opcional: arquivo fora do repositório onde será salvo o link REAL recebido por email.
+$env:HOMOLOGATION_RECOVERY_LINK_FILE = Join-Path $env:TEMP "precifica-hml-recovery-link.txt"
+node scripts/test-homologation-signup.mjs
+```
+
+Use arquivo vazio/novo para cada teste e remova o arquivo de link após o uso. Não
+publique tokens no chat nem no repositório. O teste habilitado não foi executado nesta
+rodada, pois HOMOLOGATION_TEST_EMAIL está ausente. Evidência: `homologation-enabled-signup.json`.
+
+### Auditoria de Administração → Pagamentos
+
+- Leitura exige sessão válida e `is_platform_admin`; gravação passa pela mesma
+  autorização antes de consultar ou persistir credencial.
+- Banco nega SELECT/INSERT/UPDATE/DELETE de platform_secrets ao papel authenticated.
+- A resposta de consulta contém somente status booleano e parâmetros do plano; a
+  resposta de gravação contém somente `{ ok: true }`.
+- O token **salvo** não volta ao browser. O novo valor digitado pelo administrador
+  necessariamente existe temporariamente no input de senha para envio ao servidor;
+  é limpo após sucesso. Não é serializado para outros componentes ou respostas.
+- Interface indica Configurado/Não configurado, sem recuperar o segredo salvo.
+- Entrada vazia/branca omite a coluna no upsert; novo valor explícito substitui.
+- Ativar pagamentos sem token novo, salvo ou configurado no servidor é recusado antes
+  de qualquer persistência. Pagamentos desativados recusam nova cobrança mesmo com
+  fallback de token no ambiente. Ativo sem token gera erro controlado de configuração.
+- A validação ocorre antes do INSERT da cobrança e antes da chamada de preferência.
+- Removido log do corpo bruto da resposta do provedor; agora somente HTTP status é registrado.
+- Erros de persistência retornam mensagens fixas, nunca detalhes que possam conter credenciais.
+
+Evidências: `tests/admin-payment-contract.test.ts`,
+`reports/homologation-payment-admin.json` (autorização real/ACLs + rollback) e
+`reports/homologation-token-storage.json` (upsert real por PostgREST, preservação e
+substituição). O teste de persistência usou valor sintético com cobrança desativada,
+recusaria tocar uma configuração existente e restaurou o estado vazio original.
+Nenhuma cobrança ou preferência foi criada. Não se afirma um E2E do painel implantado
+no Railway: foram validados o código compartilhado pelos handlers, banco e API.
+
+### Webhook e callbacks
+
+`MERCADO_PAGO_WEBHOOK_SECRET` permanece exclusivamente no servidor/Railway, sem campo
+no painel. A rota responde 503 sem chamar o processador quando não há secret. Testes
+verificam também ausência de detalhes sensíveis na resposta. O build público não
+contém valores secretos nem referências aos nomes de secrets do servidor; não há
+variáveis VITE_* com segredo detectado.
+
+Callbacks e notification_url continuam derivados de APP_URL no servidor. A allowlist
+agora é obrigatória: origem ausente ou não listada é recusada. HTTPS é obrigatório
+fora de localhost. O teste cobre uma origem Railway sintética, origem fora da lista
+e HTTP inválido, sem se conectar a esses domínios. Nenhum domínio Railway foi inventado
+como implantação existente. Quando o domínio real for disponibilizado, será necessário
+confirmar APP_URL/ALLOWLIST e a configuração Supabase dessa implantação; essa validação
+externa permanece pendente.
+
+### Validação desta rodada
+
+| Comando/verificação | Resultado |
+| --- | --- |
+| npx tsc --noEmit | APROVADO |
+| npm run build | APROVADO |
+| npm run test — primeira execução | 37 aprovados |
+| npm run test — segunda execução | 37 aprovados |
+| Teste integrado de administração | APROVADO, dados revertidos |
+| Upsert real de token | APROVADO, credencial original restaurada |
+| Teste de signup parametrizado | PENDENTE, email ausente; nenhuma abertura de cadastro |
+| Auditoria de secrets no cliente | Zero ocorrências detectadas |
+
+Estado final: permitir_cadastros=false, mercadopago_ativo=false, token salvo ausente,
+MERCADO_PAGO_ENVIRONMENT=sandbox, zero usuários e profiles sintéticos. Evidência:
+`homologation-admin-audit.json`. Nenhuma aprovação de produção é emitida.
+
+---
+
+## Histórico das etapas anteriores
+
+> **Decisão posterior do usuário — Mercado Pago:** configuração e teste externo
+> adiados. O administrador já pode cadastrar/substituir o Access Token em
+> Administração → Pagamentos. O token é salvo server-side em platform_secrets,
+> não é devolvido ao browser e usuários comuns não têm SELECT nessa tabela.
+> A orientação indevida para usar credencial de produção foi removida da tela.
+> O segredo de assinatura do webhook continua sendo configuração do servidor;
+> não foi criado campo ou alterado schema para armazená-lo pelo painel.
+> Cobranças permanecem desativadas e ambiente sandbox preservado. Esta decisão
+> não representa aprovação do fluxo externo de pagamentos.
+
+> **Atualização mais recente — acesso administrativo liberado:** `config diff`
+> passou; foram aplicadas exclusivamente as duas propriedades do Before User Created
+> Hook (enabled=true e URI da função hook_enforce_signup_enabled). O novo diff remoto
+> confirmou zero alterações declaradas pendentes; 13 propriedades não declaradas
+> permaneceram intactas. Signup com cadastro fechado retornou HTTP 403, zero usuários
+> e zero profiles. Cadastro temporariamente aberto retornou `email_address_invalid`
+> para o email sintético; confirmação/login/recuperação continuam pendentes de uma
+> caixa de testes válida e acessível. `permitir_cadastros=false` foi restaurado.
+> Evidência: `homologation-hosted-hook-signup.json`. **Auth Hook: APROVADO**;
+> **Signup completo: BLOQUEADO**. Os registros de falta de permissão abaixo são
+> históricos e foram superados nesta atualização. Nenhuma migration/schema/RLS/RPC
+> foi alterada. Pré-produção continua não aprovada.
+
+> Continuação concluída: concorrência de concessão manual corrigida e worker manual
+> de Storage testado, sem alterar schema ou reaplicar migrations. Consulte a seção
+> “Continuação: pendências bloqueantes” ao final para os resultados atuais.
+
 ## Destino e limites
 
 - Projeto autorizado pelo usuário: `adkfebcanubebtmqyram`, HOMOLOGAÇÃO.
@@ -139,9 +284,9 @@ Estado final confirmado: zero usuários Auth, empresas, cobranças, objetos logo
 | Alta | Signup público completo não comprovado | Após ativar Hook, testar bloqueio/abertura explícita, confirmação de email, login e profile |
 | Alta | Cota de IA sem regra aprovada | Definir janela/reset/limite e concorrência; função nova retorna false até lá |
 | Alta | Pagamento externo sandbox não validado | Configurar credenciais sandbox e executar fluxo checkout/webhook real de teste |
-| Média | Concessão manual atual é read-modify-write no servidor | Revisar atomicidade com pagamentos concorrentes antes de uso financeiro real |
+| Resolvido | Concessão manual usava read-modify-write sem proteção | Atualização condicional atômica + retry de conflito; concorrência real aprovada nesta continuação |
 | Média | Reversões com concessões sobrepostas exigem reconciliação | Definir contrato de estorno sem apagar direitos de outras origens |
-| Média | Não há worker de retry de Storage comprovado | Definir operação da fila e testar falha/retry real |
+| Média | Worker manual comprovado; scheduler ainda não definido | Definir host, periodicidade e monitoração da operação da fila |
 | Baixa | Histórico antigo irrecuperável | Manter baseline explicitamente nova; não atribuir origem histórica às decisões |
 
 ## Comandos para reproduzir em homologação
@@ -173,6 +318,118 @@ npx supabase config push --project-ref adkfebcanubebtmqyram
 
 O config local declara apenas o hook Before User Created. Não usar a produção como destino e não habilitar cadastros antes de confirmar a ativação hospedada.
 
+## Continuação: pendências bloqueantes
+
+Nenhuma migration foi criada, aplicada ou reaplicada nesta rodada. Nenhuma alteração de schema foi necessária. A correção da licença usa UPDATE condicional atômico sobre o contrato já existente.
+
+### Auth Hook e signup
+
+Tentativas realizadas na ordem solicitada:
+
+1. `npx supabase config diff --project-ref adkfebcanubebtmqyram`: falhou com `ConfigDiffReadStatusError`, informando falta de permissão para visualizar a configuração.
+2. Management API: não há `SUPABASE_ACCESS_TOKEN` utilizável no ambiente, nas variáveis Windows de usuário/sistema ou no arquivo convencional de token. Não foi reutilizada a secret key da aplicação como credencial administrativa.
+3. Integração Supabase, get_project no ref autorizado: recusou com `You do not have permission to perform this action`.
+
+Como o diff remoto não pôde ser revisado, **config push não foi executado**. A configuração local segue contendo somente o Hook esperado, mas isso não comprova ativação hospedada.
+
+`permitir_cadastros=false` foi preservado. Os testes públicos de signup/confirmar email/recuperar e redefinir senha dependem da ativação do Hook e permanecem bloqueados; não se usou criação por Auth Admin como substituto desses testes. Os testes existentes de criação de profile e login via Auth Admin foram reexecutados e passaram. A ausência final de usuários/profiles sintéticos foi conferida.
+
+Desbloqueio necessário: autenticar o CLI ou a integração com uma conta que tenha permissão de configuração **neste projeto**, repetir o diff, aplicar somente o Hook e confirmar remotamente. Secrets não devem ser enviados no chat.
+
+### Mercado Pago sandbox real
+
+Ambiente local: sandbox. Access token e segredo de webhook ausentes no processo/arquivos utilizados e nas variáveis Windows de usuário/sistema. `platform_secrets` continua sem token e com Mercado Pago desativado. `APP_URL` é localhost, sem endpoint HTTPS público de callback/webhook comprovado.
+
+Não houve chamada de checkout nem pagamento externo. Não foram usadas credenciais de produção. Eventos sintéticos internos continuam sendo testes da RPC, não um teste de pagamento real sandbox.
+
+Desbloqueio necessário: credenciais comprovadamente sandbox, comprador de teste, URL HTTPS acessível e permitida para callbacks/webhook, e acesso ao checkout de teste. Depois validar assinatura real, consulta do pagamento, duplicidade e reversão suportada. Não habilitar pagamentos reais para contornar esse bloqueio.
+
+### Concessão manual e trial
+
+O risco de perda de atualização foi confirmado em `liberarLicenca`: uma leitura seguida de UPDATE incondicional poderia sobrescrever a extensão realizada por um pagamento concorrente. `estenderTeste` possuía o mesmo padrão.
+
+Correção em `src/lib/license-extension.ts`, usada pelos dois handlers:
+
+- lê a expiração atual;
+- calcula a mesma extensão anterior (meses via Date.setMonth; dias via 86.400.000 ms);
+- atualiza somente se a coluna ainda contém o valor lido, usando igualdade ou IS NULL;
+- se nenhuma linha foi alterada, relê e recalcula, com limite de oito conflitos;
+- erro de rede/DB não é reaplicado automaticamente, pois pode haver resultado de commit desconhecido;
+- mantém `exigirAdmin` e o acesso server-side existentes.
+
+A escrita é atômica no PostgreSQL; o retry reage ao pagamento que ganhou a corrida. Não foram necessárias RPC nova, migration ou novas permissões. Remover licença continua sendo a operação explícita de zerar a data, sem mudar sua semântica.
+
+Testes reais com a RPC de pagamento:
+
+1. pagamento entre leitura e UPDATE da concessão: conflito detectado, releitura e soma preservada;
+2. concessão antes do pagamento: ambas as extensões preservadas;
+3. duas concessões e um pagamento simultâneos: soma final preservada.
+
+Evidência: `homologation-license-concurrency.json`. O teste financeiro anterior de seis cenários também passou novamente. Reversões com direitos sobrepostos continuam recusadas para reconciliação, como antes.
+
+### Storage cleanup
+
+Implementado `scripts/storage-cleanup-worker.mjs`: uma passagem manual e limitada sobre a fila existente, exclusivamente no projeto fixado de homologação.
+
+- aceita somente bucket logos e paths canônicos `<uuid>/logo-...png|jpg|jpeg|webp`;
+- trava empresa antes de job, na mesma ordem das RPCs, para evitar deadlocks e proteger logo ativo;
+- mantém a trava durante a remoção; nunca remove logo atualmente referenciado;
+- falha incrementa attempts e conserva o job, com erro sanitizado;
+- sucesso remove o job; repetição após remoção externa é segura;
+- usa locks de linha/SKIP LOCKED para coordenar workers;
+- chamada externa tem timeout; logs não imprimem credenciais.
+
+`scripts/test-homologation-cleanup.mjs` passou em seis cenários: falha inicial e criação real do job, falha do worker com retenção, sucesso posterior, objeto já removido, logo ativo e dois workers concorrentes, além de validação de path/bucket. A indisponibilidade do Storage foi injetada na borda da API; banco, RPC, locks e remoção posterior foram reais em objetos sintéticos. Nenhum objeto real foi removido.
+
+Execução manual:
+
+```powershell
+node scripts/storage-cleanup-worker.mjs
+```
+
+**Pendência operacional:** não há scheduler definido. Não foi criada tarefa automática, Cron ou Edge Function por suposição. Definir host, intervalo, credenciais seguras, monitoração e tratamento dos jobs marcados ACTIVE_LOGO/INVALID_LOGO_PATH antes de operar continuamente. O worker não descobre objetos órfãos sem job; cobre a fila já contratada pela aplicação.
+
+### IA
+
+**REGRA DE NEGÓCIO PENDENTE.** Inventário e proposta em [IA_REGRA_DE_NEGOCIO_PENDENTE.md](IA_REGRA_DE_NEGOCIO_PENDENTE.md). Não há chamada executável à RPC no frontend/handlers atuais. Os cinco usos aceitos são apenas uma expectativa do teste SQL antigo, sem janela definida. A função existente continua recusando consumo; nenhuma implementação de cota foi adicionada.
+
+### Validação desta continuação
+
+| Verificação | Resultado atual |
+| --- | --- |
+| npx tsc --noEmit | APROVADO |
+| npm run build | APROVADO |
+| npm run test — execução 1 | APROVADO: 30 testes |
+| npm run test — execução 2 | APROVADO: 30 testes |
+| npm run test:security | APROVADO: 30 testes |
+| Scripts SQL compatíveis | APROVADOS; script antigo com cota de IA permanece bloqueado |
+| API Auth Admin/REST/Storage | 12 grupos aprovados; signup público bloqueado |
+| Concorrência licença | 3 cenários reais aprovados |
+| Concorrência financeira anterior | 6 cenários aprovados novamente |
+| Cleanup | Worker e retry aprovados; scheduler pendente |
+| Advisor de segurança | APROVADO: reexecutado, nenhuma ocorrência |
+
+Conferência final desta continuação: baseline local idêntica ao SQL registrado no banco,
+quatro migrations de recuperação com SHA-256 preservado e histórico com somente a baseline
+anterior. Zero usuários, profiles, empresas, pagamentos, logos e jobs de teste restantes.
+`permitir_cadastros=false` e `permitir_demo=false`. Evidência:
+`homologation-followup-state.json`.
+
+Arquivos principais alterados/criados nesta rodada: `src/lib/license-extension.ts`, `src/lib/admin.functions.ts`, `tests/license-extension.test.ts`, `scripts/storage-cleanup-worker.mjs`, `scripts/test-homologation-license-concurrency.mts`, `scripts/test-homologation-cleanup.mjs` e os relatórios. Tipos gerados, baseline e migrations de recuperação foram preservados.
+
+### Status final solicitado
+
+| Item | Status |
+| --- | --- |
+| Auth Hook | **APROVADO** — ativado e confirmado remotamente; signup fechado retorna 403 sem órfãos |
+| Signup | **BLOQUEADO** — depende de email válido de testes para confirmação e recuperação |
+| Mercado Pago sandbox | **BLOQUEADO** — credenciais e endpoint público ausentes |
+| IA | **REGRA DE NEGÓCIO PENDENTE** |
+| Storage cleanup | **PENDENTE** — worker aprovado, falta scheduler/operação |
+| Concorrência licença | **APROVADO** |
+
 ## Veredito
 
 **HOMOLOGAÇÃO APROVADA COM PENDÊNCIAS**, limitada à baseline e aos cenários efetivamente testados. **Não aprovada para produção**: Auth Hook/signup, IA e integração externa de pagamentos ainda estão bloqueados ou incompletos.
+
+**Pré-produção também não aprovada nesta continuação**: o Auth Hook foi aprovado na atualização mais recente, mas signup completo e Mercado Pago sandbox permanecem bloqueados.

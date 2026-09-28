@@ -1,0 +1,20 @@
+{
+  "hookRemoteConfirmed": true,
+  "closed": {
+    "status": 403,
+    "code": "unknown",
+    "userReturned": false,
+    "users": 0,
+    "profiles": 0
+  },
+  "open": {
+    "status": 400,
+    "code": "email_address_invalid",
+    "userReturned": false,
+    "sessionReturned": false,
+    "users": 0,
+    "profiles": 0
+  },
+  "signupDisabled": true,
+  "syntheticRemoved": true
+}

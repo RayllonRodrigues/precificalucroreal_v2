@@ -1,4 +1,4 @@
-import { selectPaymentToken } from "./payment-configuration";
+import { selectPaymentToken, requireNewPaymentToken } from "./payment-configuration";
 import { cobrancaMercadoPagoConfere } from "./payment-contract";
 
 /** Reconciliation may use credentials while new charges are disabled. */
@@ -10,7 +10,8 @@ export async function obterTokenMercadoPago(paraNovaCobranca = false): Promise<s
     .eq("id", true)
     .maybeSingle();
   if (error) throw new Error("Não foi possível verificar a configuração de pagamento.");
-  return selectPaymentToken(data, process.env["MERCADO_PAGO_ACCESS_TOKEN"], paraNovaCobranca);
+  if (paraNovaCobranca) return requireNewPaymentToken(data, process.env["MERCADO_PAGO_ACCESS_TOKEN"]);
+  return selectPaymentToken(data, process.env["MERCADO_PAGO_ACCESS_TOKEN"], false);
 }
 
 export function obterSegredosWebhookMercadoPago(): string[] {
@@ -65,7 +66,7 @@ export function obterUrlAplicacao(): URL {
     .map((item) => item.trim())
     .filter(Boolean)
     .map((item) => new URL(item).origin);
-  if (allowlist.length > 0 && !allowlist.includes(url.origin)) {
+  if (!allowlist.includes(url.origin)) {
     throw new Error("APP_URL não pertence à APP_URL_ALLOWLIST.");
   }
 
