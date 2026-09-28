@@ -8,6 +8,7 @@ import { buildDemoPayload } from "../src/lib/demo-data";
 test("company creation omits the unassigned UUID from payment methods", async () => {
   const company = { id: "created-company" };
   const client = {
+    auth: { getUser: async () => ({ data: { user: { id: "owner" } }, error: null }) },
     rpc: async (name: string, args: { _payment_methods: Record<string, unknown>[] }) => {
       assert.equal(name, "create_company_with_payment_methods");
       assert.ok(args._payment_methods.length > 0);
@@ -42,6 +43,7 @@ test("creation, demo seed and removal propagate errors without fallback writes o
   const calls: string[] = [];
   const error = new Error("database denied operation");
   const client = {
+    auth: { getUser: async () => ({ data: { user: { id: "owner" } }, error: null }) },
     rpc: async (name: string) => {
       calls.push(name);
       return { data: null, error };
@@ -56,4 +58,32 @@ test("creation, demo seed and removal propagate errors without fallback writes o
     "seed_company_demo",
     "remove_company_demo",
   ]);
+});
+
+test("deleted account clears only the local session and never creates a company", async () => {
+  let signedOut = false;
+  const client = {
+    auth: {
+      getUser: async () => ({ data: { user: null }, error: { status: 403, code: "user_not_found" } }),
+      signOut: async (options: { scope: string }) => {
+        assert.equal(options.scope, "local");
+        signedOut = true;
+        return { error: null };
+      },
+    },
+    rpc: async () => { assert.fail("Invalid account must not reach the database write"); },
+  } as unknown as SupabaseClient<Database>;
+  await assert.rejects(companyOperations(client).create({ nome: "Empresa" }), /sessão não é mais válida/);
+  assert.equal(signedOut, true);
+});
+
+test("temporary Auth failure blocks saving without discarding the session", async () => {
+  const client = {
+    auth: {
+      getUser: async () => ({ data: { user: null }, error: { status: 503 } }),
+      signOut: async () => { assert.fail("A temporary failure must not log the user out"); },
+    },
+    rpc: async () => { assert.fail("Unverified account must not reach the database write"); },
+  } as unknown as SupabaseClient<Database>;
+  await assert.rejects(companyOperations(client).create({ nome: "Empresa" }), /validar sua sessão/);
 });
