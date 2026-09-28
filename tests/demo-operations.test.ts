@@ -5,6 +5,22 @@ import type { Database } from "../src/integrations/supabase/types";
 import { companyOperations } from "../src/lib/demo-operations";
 import { buildDemoPayload } from "../src/lib/demo-data";
 
+test("company creation omits the unassigned UUID from payment methods", async () => {
+  const company = { id: "created-company" };
+  const client = {
+    rpc: async (name: string, args: { _payment_methods: Record<string, unknown>[] }) => {
+      assert.equal(name, "create_company_with_payment_methods");
+      assert.ok(args._payment_methods.length > 0);
+      for (const method of args._payment_methods) {
+        assert.equal(Object.hasOwn(method, "company_id"), false);
+        assert.equal(method.is_demo, false);
+      }
+      return { data: company, error: null };
+    },
+  } as unknown as SupabaseClient<Database>;
+  assert.equal(await companyOperations(client).create({ nome: "Empresa" }), company);
+});
+
 test("demo examples keep existing values and calculations reference newly inserted IDs", () => {
   const payload = buildDemoPayload("tenant");
   assert.equal(payload.products.length, 4);
