@@ -16,6 +16,7 @@ import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
 import { Route as DespesasRouteImport } from './routes/despesas'
 import { Route as EntrarRouteImport } from './routes/entrar'
 import { Route as EquipeRouteImport } from './routes/equipe'
+import { Route as HealthRouteImport } from './routes/health'
 import { Route as HistoricoRouteImport } from './routes/historico'
 import { Route as ItensRouteImport } from './routes/itens'
 import { Route as LicencaRouteImport } from './routes/licenca'
@@ -61,6 +62,11 @@ const EntrarRoute = EntrarRouteImport.update({
 const EquipeRoute = EquipeRouteImport.update({
   id: '/equipe',
   path: '/equipe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HealthRoute = HealthRouteImport.update({
+  id: '/health',
+  path: '/health',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HistoricoRoute = HistoricoRouteImport.update({
@@ -127,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/despesas': typeof DespesasRoute
   '/entrar': typeof EntrarRoute
   '/equipe': typeof EquipeRoute
+  '/health': typeof HealthRoute
   '/historico': typeof HistoricoRoute
   '/itens': typeof ItensRoute
   '/licenca': typeof LicencaRoute
@@ -147,6 +154,7 @@ export interface FileRoutesByTo {
   '/despesas': typeof DespesasRoute
   '/entrar': typeof EntrarRoute
   '/equipe': typeof EquipeRoute
+  '/health': typeof HealthRoute
   '/historico': typeof HistoricoRoute
   '/itens': typeof ItensRoute
   '/licenca': typeof LicencaRoute
@@ -168,6 +176,7 @@ export interface FileRoutesById {
   '/despesas': typeof DespesasRoute
   '/entrar': typeof EntrarRoute
   '/equipe': typeof EquipeRoute
+  '/health': typeof HealthRoute
   '/historico': typeof HistoricoRoute
   '/itens': typeof ItensRoute
   '/licenca': typeof LicencaRoute
@@ -190,6 +199,7 @@ export interface FileRouteTypes {
     | '/despesas'
     | '/entrar'
     | '/equipe'
+    | '/health'
     | '/historico'
     | '/itens'
     | '/licenca'
@@ -210,6 +220,7 @@ export interface FileRouteTypes {
     | '/despesas'
     | '/entrar'
     | '/equipe'
+    | '/health'
     | '/historico'
     | '/itens'
     | '/licenca'
@@ -230,6 +241,7 @@ export interface FileRouteTypes {
     | '/despesas'
     | '/entrar'
     | '/equipe'
+    | '/health'
     | '/historico'
     | '/itens'
     | '/licenca'
@@ -251,6 +263,7 @@ export interface RootRouteChildren {
   DespesasRoute: typeof DespesasRoute
   EntrarRoute: typeof EntrarRoute
   EquipeRoute: typeof EquipeRoute
+  HealthRoute: typeof HealthRoute
   HistoricoRoute: typeof HistoricoRoute
   ItensRoute: typeof ItensRoute
   LicencaRoute: typeof LicencaRoute
@@ -313,6 +326,13 @@ declare module '@tanstack/react-router' {
       path: '/equipe'
       fullPath: '/equipe'
       preLoaderRoute: typeof EquipeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/health': {
+      id: '/health'
+      path: '/health'
+      fullPath: '/health'
+      preLoaderRoute: typeof HealthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/historico': {
@@ -403,6 +423,7 @@ const rootRouteChildren: RootRouteChildren = {
   DespesasRoute: DespesasRoute,
   EntrarRoute: EntrarRoute,
   EquipeRoute: EquipeRoute,
+  HealthRoute: HealthRoute,
   HistoricoRoute: HistoricoRoute,
   ItensRoute: ItensRoute,
   LicencaRoute: LicencaRoute,

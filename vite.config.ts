@@ -12,7 +12,7 @@ export default defineConfig({
   plugins: [
     tailwindcss(),
     tanstackStart({ server: { entry: "server" } }),
-    nitro({ preset: "cloudflare-module" }),
+    nitro({ preset: "node-server" }),
     react(),
   ],
 });

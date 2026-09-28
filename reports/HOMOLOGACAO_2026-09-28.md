@@ -1,6 +1,76 @@
 # Baseline e validação de homologação — 28/09/2026
 
-## Atualização atual: signup parametrizado e configuração administrativa
+## Validação pública Railway — estado atual
+
+Destino exclusivo: `https://precificalucroreal.up.railway.app`, homologação
+`adkfebcanubebtmqyram`. Nenhuma alteração de código, ambiente, schema ou migrations;
+produção não acessada. Nenhum usuário criado e nenhum fluxo de email/senha executado.
+
+| Item | Estado atual |
+| --- | --- |
+| Railway público | **BLOQUEADO** — aplicação retorna HTTP 502 |
+| Auth Hook remoto | **APROVADO** — evidência remota anterior preservada |
+| Signup bloqueado | **APROVADO** — teste anterior HTTP 403; flag false reconfirmada por leitura nesta rodada; fluxo público Railway bloqueado pelo 502 |
+| Signup habilitado | **ADIADO** |
+| Confirmação de email | **ADIADO** |
+| Recuperação de senha | **ADIADO** |
+| Redefinição de senha | **ADIADO** |
+| Configuração administrativa Mercado Pago | **APROVADA** — evidências anteriores e testes locais; painel hospedado não verificável nesta rodada |
+| Pagamento sandbox externo | **ADIADO** |
+| IA | **REGRA DE NEGÓCIO PENDENTE** |
+| Storage scheduler | **PENDÊNCIA OPERACIONAL** |
+
+### Evidências desta rodada
+
+- HTTPS validado pelo cliente Node com verificação padrão de certificado e hostname:
+  `tlsAuthorized=true`; certificado válido até 26/12/2026. Isso comprova o TLS do
+  domínio, não a saúde da aplicação atrás do proxy.
+- GET `/`, `/health`, `/entrar` e `/api/public/mercadopago`: todos HTTP 502,
+  `Application failed to respond`. POST com JSON vazio no webhook: também 502.
+  Não há rota health no código local inspecionado; o 502 não permite verificar
+  sua existência no deployment.
+- HTML da aplicação, login e assets publicados: **BLOQUEADOS**. As respostas
+  observadas são erros do Railway, sem segredo aparente. Não é possível aprovar
+  ausência de secrets em JS/HTML hospedados que não foram servidos.
+- Webhook publicado, recusa de GET e POST inválido: **BLOQUEADOS** no ambiente
+  público. O código local define GET 405 e recusa segura sem webhook secret;
+  o 502 do proxy não é evidência de execução dessas proteções.
+- Consulta somente leitura no projeto autorizado: `permitir_cadastros=false`,
+  `mercadopago_ativo=false`, token salvo ausente. Não houve alteração de flags.
+- Ambiente local: `MERCADO_PAGO_ENVIRONMENT=sandbox`; Access Token e webhook secret
+  ausentes. `APP_URL=http://localhost:3000` e
+  `APP_URL_ALLOWLIST=http://localhost:3000`: **DIVERGENTES** do domínio público
+  solicitado. Variáveis efetivas do Railway **NÃO CONFIRMADAS**; não inferidas a
+  partir do ambiente local nem alteradas nesta validação.
+- Callbacks são montadas server-side a partir de APP_URL e exigem allowlist.
+  Com os valores locais atuais apontariam para localhost; não foi criada cobrança.
+  Ausência de callbacks localhost/produção no deployment permanece bloqueada.
+- Scan dos 73 arquivos de `.output/public` recém-gerados: zero arquivos com valores
+  secretos conhecidos, padrão `sb_secret_` ou ref de produção
+  `bjtyeikuomxudmtdxtrp`. Esta verificação é local e não substitui a inspeção remota.
+- Possível incompatibilidade de deployment a investigar: `vite.config.ts` usa
+  `nitro({ preset: "cloudflare-module" })` e package.json não declara `start`.
+  Sem logs/comando de inicialização do Railway, isso não comprova a causa do 502.
+
+### Validação local
+
+| Comando | Resultado |
+| --- | --- |
+| `npx tsc --noEmit` | APROVADO, exit 0 |
+| `npm run build` | APROVADO, exit 0 |
+| `npm run test` — execução 1 | APROVADO, 37/37 |
+| `npm run test` — execução 2 | APROVADO, 37/37 |
+
+Logs: `homologation-public-typescript.txt`, `homologation-public-build.txt`,
+`homologation-public-tests-1.txt`, `homologation-public-tests-2.txt`.
+
+Próxima ação necessária: inspecionar logs de deployment, comando de start e porta
+no Railway; confirmar APP_URL/allowlist hospedadas e ref de homologação. Após
+restabelecer resposta da aplicação, repetir smoke público, assets e webhook.
+Nenhuma correção de deployment foi aplicada nesta etapa. Pré-produção não aprovada;
+produção não declarada pronta.
+
+## Histórico: signup parametrizado e configuração administrativa
 
 Nenhuma alteração de schema, RLS ou RPC; nenhuma migration reaplicada; produção não acessada.
 

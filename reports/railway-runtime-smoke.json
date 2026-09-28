@@ -1,0 +1,38 @@
+[
+  {
+    "route": "/",
+    "status": 200,
+    "type": "text/html; charset=utf-8",
+    "bytes": 39891
+  },
+  {
+    "route": "/health",
+    "status": 200,
+    "type": "application/json",
+    "body": "{\"status\":\"ok\"}",
+    "bytes": 15
+  },
+  {
+    "route": "/entrar",
+    "status": 200,
+    "type": "text/html; charset=utf-8",
+    "bytes": 9474
+  },
+  {
+    "route": "/api/public/mercadopago",
+    "status": 405,
+    "type": null,
+    "bytes": 0
+  },
+  {
+    "method": "POST",
+    "status": 503,
+    "body": "Webhook indisponível."
+  },
+  {
+    "alive": true,
+    "healthAfterPost": 200,
+    "bindConfirmed": true,
+    "bindEvidence": "Get-NetTCPConnection: 0.0.0.0:41874, second npm start with alternate PORT"
+  }
+]
