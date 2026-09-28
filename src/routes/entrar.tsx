@@ -11,6 +11,7 @@ import { mensagemAuth } from "@/lib/auth-messages";
 import { obterConfigPublica } from "@/lib/platform.functions";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthPasswordField } from "@/components/auth-password-field";
+import { InstallAppButton } from "@/components/install-app";
 import { BrandMark } from "@/components/app-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -547,6 +548,7 @@ function AuthPage() {
               )}
             </div>
           </div>
+          <InstallAppButton className="mx-auto mb-3" />
           <p className="text-center text-xs text-muted-foreground">
             Precifica · Mais clareza para o seu negócio.
           </p>

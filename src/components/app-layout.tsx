@@ -26,6 +26,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { CompanyLogo } from "@/components/company-logo";
+import { InstallAppButton } from "@/components/install-app";
 import { statusLicenca } from "@/lib/licenca";
 
 export const NAV_ITEMS = [
@@ -103,6 +104,7 @@ function NavList({ onNavigate, compact }: { onNavigate?: () => void; compact?: b
         <MessageCircle className="size-[18px] shrink-0" aria-hidden />
         {!compact && <span>Comunidade no WhatsApp</span>}
       </a>
+      <InstallAppButton compact={compact} onClick={onNavigate} />
     </nav>
   );
 }
