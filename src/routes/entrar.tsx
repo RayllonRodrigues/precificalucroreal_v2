@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, Mail } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, ChevronDown, Loader2, Mail, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,6 +10,7 @@ import { LocalFields } from "@/components/local-fields";
 import { mensagemAuth } from "@/lib/auth-messages";
 import { obterConfigPublica } from "@/lib/platform.functions";
 import { useAuth } from "@/hooks/useAuth";
+import { AuthPasswordField } from "@/components/auth-password-field";
 import { BrandMark } from "@/components/app-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,7 +41,12 @@ function AuthPage() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const fnConfig = useServerFn(obterConfigPublica);
-  const { data: config } = useQuery({
+  const {
+    data: config,
+    isPending: configLoading,
+    isError: configError,
+    refetch: reloadConfig,
+  } = useQuery({
     queryKey: ["platform", "public"],
     queryFn: () => fnConfig(),
     retry: false,
@@ -142,6 +148,7 @@ function AuthPage() {
       toast.error("O CNPJ precisa ter 14 dígitos (ou deixe em branco).");
       return;
     }
+    setBloqueio(null);
     setBusy(true);
     const { data, error } = await supabase.auth.signUp({
       email: email.trim(),
@@ -161,7 +168,9 @@ function AuthPage() {
     setBusy(false);
     if (error) {
       toast.error(mensagemAuth(error, "Não foi possível criar a conta. Tente novamente."));
-      setBloqueio(error.message || "Erro desconhecido ao criar a conta.");
+      setBloqueio(
+        mensagemAuth(error, "Não foi possível criar sua conta. Tente novamente em instantes."),
+      );
       return;
     }
     if (data.session) {
@@ -188,199 +197,360 @@ function AuthPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-app-gradient px-4 py-10">
-      <div className="w-full max-w-md">
-        <div className="mb-6 flex justify-center">
-          <Link to="/">
+    <div className="min-h-svh bg-background">
+      <div className="mx-auto grid min-h-svh max-w-[1440px] lg:grid-cols-[0.95fr_1.05fr]">
+        <aside className="relative hidden flex-col justify-between overflow-hidden bg-primary p-12 text-primary-foreground lg:flex xl:p-16">
+          <div
+            className="pointer-events-none absolute -right-32 -top-32 size-[480px] rounded-full border-[80px] border-white/5"
+            aria-hidden
+          />
+          <div
+            className="pointer-events-none absolute -bottom-40 -left-40 size-[500px] rounded-full bg-secondary/20 blur-3xl"
+            aria-hidden
+          />
+          <Link
+            to="/"
+            className="relative w-fit rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white [&_.text-muted-foreground]:text-white/80"
+            aria-label="Precifica · voltar ao início"
+          >
             <BrandMark />
           </Link>
-        </div>
-        {config?.mensagemAviso && (
-          <div className="mb-4 rounded-lg border border-border bg-card p-3 text-sm">
-            {config.mensagemAviso}
+          <div className="relative my-16 max-w-md">
+            <p className="mb-5 text-xs font-semibold uppercase tracking-[0.2em] text-white/80">
+              Seu negócio, com mais clareza
+            </p>
+            <h2 className="font-display text-4xl font-bold leading-tight tracking-tight xl:text-5xl">
+              Preço bem calculado.
+              <br />
+              <span className="text-white/75">Lucro de verdade.</span>
+            </h2>
+            <p className="mt-6 max-w-sm text-base leading-relaxed text-white/85">
+              Entenda seus custos, encontre o preço certo e cuide do crescimento do seu negócio.
+            </p>
+            <div className="mt-10 rounded-2xl border border-white/20 bg-white/10 p-6">
+              <div className="mb-5 flex items-center justify-between gap-3">
+                <span className="text-sm font-medium">Cada venda faz mais sentido</span>
+                <TrendingUp className="size-5" aria-hidden />
+              </div>
+              <ul className="space-y-4 text-sm">
+                {[
+                  "Custos e despesas no mesmo lugar",
+                  "Preços com margem de lucro clara",
+                  "Decisões com os números do seu negócio",
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3">
+                    <Check className="mt-0.5 size-4 shrink-0" aria-hidden />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-        )}
+          <p className="relative text-xs text-white/75">
+            Para quem empreende e quer crescer com confiança.
+          </p>
+        </aside>
 
-        <div className="card-soft p-6">
-          {recuperar ? (
-            <form onSubmit={handleReset} className="space-y-4">
-              <div>
-                <h2 className="font-display text-xl font-bold">Recuperar senha</h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Informe seu e-mail e enviaremos um link para criar uma nova senha.
-                </p>
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="email-reset">E-mail</Label>
-                <Input
-                  id="email-reset"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="voce@email.com.br"
-                />
-              </div>
-              <Button type="submit" className="w-full gap-2 font-semibold" disabled={busy}>
-                {busy ? <Loader2 className="size-4 animate-spin" /> : <Mail className="size-4" />}
-                Enviar link
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                className="w-full"
-                onClick={() => setRecuperar(false)}
+        <main className="flex min-w-0 flex-col px-5 py-7 sm:px-10 sm:py-10 lg:px-12 xl:px-20">
+          <div className="flex items-center justify-between gap-4">
+            <Link to="/" className="rounded-xl lg:hidden" aria-label="Precifica · voltar ao início">
+              <BrandMark />
+            </Link>
+            <Link
+              to="/"
+              className="ml-auto inline-flex min-h-11 items-center gap-2 rounded-lg text-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <ArrowLeft className="size-4" aria-hidden />
+              <span>Voltar ao site</span>
+            </Link>
+          </div>
+          <div className="mx-auto my-auto w-full max-w-md py-10 sm:py-12">
+            <header className="mb-8">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+                {recuperar
+                  ? "Vamos ajudar você"
+                  : tab === "login"
+                    ? "Bom ter você por aqui"
+                    : "Seu próximo passo começa aqui"}
+              </p>
+              <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+                {recuperar
+                  ? "Recupere seu acesso"
+                  : tab === "login"
+                    ? "Bem-vindo de volta."
+                    : "Comece pelo preço certo."}
+              </h1>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                {recuperar
+                  ? "Informe seu e-mail para receber um link e criar uma nova senha."
+                  : tab === "login"
+                    ? "Entre para acompanhar seus resultados e continuar de onde parou."
+                    : "Crie sua conta. Depois, vamos configurar seu negócio juntos."}
+              </p>
+            </header>
+            {config?.mensagemAviso && (
+              <div
+                role="status"
+                className="mb-5 rounded-xl border border-border bg-accent/50 p-4 text-sm"
               >
-                Voltar
-              </Button>
-            </form>
-          ) : (
-            <Tabs value={tab} onValueChange={setTab}>
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="login">Entrar</TabsTrigger>
-                <TabsTrigger value="cadastro">Criar conta</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="login" className="mt-5">
-                <form onSubmit={handleLogin} className="space-y-4">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="email-login">E-mail</Label>
+                {config.mensagemAviso}
+              </div>
+            )}
+            <div className="[&_input]:h-12 [&_input]:rounded-xl [&_input]:text-base [&_button[role=combobox]]:min-h-12">
+              {recuperar ? (
+                <form
+                  onSubmit={handleReset}
+                  className="space-y-5"
+                  aria-label="Recuperar senha"
+                  aria-busy={busy}
+                >
+                  <div className="space-y-2">
+                    <Label htmlFor="email-reset">E-mail</Label>
                     <Input
-                      id="email-login"
+                      id="email-reset"
                       type="email"
                       required
                       autoComplete="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="voce@email.com.br"
+                      placeholder="voce@exemplo.com.br"
                     />
                   </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="senha-login">Senha</Label>
-                    <Input
-                      id="senha-login"
-                      type="password"
-                      required
-                      autoComplete="current-password"
-                      value={senha}
-                      onChange={(e) => setSenha(e.target.value)}
-                    />
-                  </div>
-                  <Button type="submit" className="w-full font-semibold" disabled={busy}>
-                    {busy && <Loader2 className="mr-2 size-4 animate-spin" />}
-                    Entrar
-                  </Button>
-                  <button
-                    type="button"
-                    className="w-full text-sm font-medium text-primary underline-offset-4 hover:underline"
-                    onClick={() => setRecuperar(true)}
-                  >
-                    Esqueci minha senha
-                  </button>
-                </form>
-              </TabsContent>
-
-              <TabsContent value="cadastro" className="mt-5">
-                <form onSubmit={handleSignUp} className="space-y-4">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="nome">Nome completo</Label>
-                    <Input
-                      id="nome"
-                      required
-                      autoComplete="name"
-                      value={nome}
-                      onChange={(e) => setNome(e.target.value)}
-                      placeholder="Maria Silva"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="email-signup">E-mail</Label>
-                    <Input
-                      id="email-signup"
-                      type="email"
-                      required
-                      autoComplete="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="voce@email.com.br"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="telefone">Telefone / WhatsApp</Label>
-                    <Input
-                      id="telefone"
-                      type="tel"
-                      inputMode="tel"
-                      autoComplete="tel"
-                      value={telefone}
-                      onChange={(e) => setTelefone(mascaraTelefone(e.target.value))}
-                      placeholder="(11) 99999-9999"
-                    />
-                  </div>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="cpf">CPF</Label>
-                      <Input
-                        id="cpf"
-                        inputMode="numeric"
-                        required
-                        value={cpf}
-                        onChange={(e) => setCpf(mascaraCpf(e.target.value))}
-                        placeholder="000.000.000-00"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="cnpj">CNPJ (opcional)</Label>
-                      <Input
-                        id="cnpj"
-                        inputMode="numeric"
-                        value={cnpj}
-                        onChange={(e) => setCnpj(mascaraCnpj(e.target.value))}
-                        placeholder="00.000.000/0000-00"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="senha-signup">Senha</Label>
-                    <Input
-                      id="senha-signup"
-                      type="password"
-                      required
-                      autoComplete="new-password"
-                      value={senha}
-                      onChange={(e) => setSenha(e.target.value)}
-                      placeholder="Mínimo de 6 caracteres"
-                    />
-                  </div>
-                  <LocalFields
-                    uf={uf}
-                    cidade={cidade}
-                    onUfChange={setUf}
-                    onCidadeChange={setCidade}
-                  />
-                  {bloqueio && (
-                    <div className="rounded-lg border border-amber-300/60 bg-amber-50 p-3 text-sm dark:border-amber-500/40 dark:bg-amber-950/40">
-                      <p className="font-medium text-amber-900 dark:text-amber-200">
-                        Seu cadastro foi bloqueado pela segurança da senha.
-                      </p>
-                      <p className="mt-2 text-amber-900/90 dark:text-amber-100/90">
-                        Revise os requisitos da senha e tente novamente.
-                      </p>
-                    </div>
-                  )}
                   <Button
                     type="submit"
-                    className="w-full font-semibold"
-                    disabled={busy || config?.permitirCadastros !== true}
+                    className="h-12 w-full rounded-xl font-semibold"
+                    disabled={busy}
                   >
-                    {busy && <Loader2 className="mr-2 size-4 animate-spin" />}
-                    Criar conta
+                    {busy ? (
+                      <Loader2 className="size-4 animate-spin" aria-hidden />
+                    ) : (
+                      <Mail className="size-4" aria-hidden />
+                    )}{" "}
+                    Enviar link de recuperação
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="min-h-11 w-full"
+                    onClick={() => setRecuperar(false)}
+                  >
+                    <ArrowLeft aria-hidden /> Voltar para entrar
                   </Button>
                 </form>
-              </TabsContent>
-            </Tabs>
-          )}
-        </div>
+              ) : (
+                <Tabs
+                  value={tab}
+                  onValueChange={(value) => {
+                    setTab(value);
+                    setBloqueio(null);
+                  }}
+                >
+                  <TabsList className="mb-7 grid h-12 w-full grid-cols-2 rounded-xl p-1">
+                    <TabsTrigger value="login" className="h-10 rounded-lg">
+                      Entrar
+                    </TabsTrigger>
+                    <TabsTrigger value="cadastro" className="h-10 rounded-lg">
+                      Criar conta
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="login">
+                    <form
+                      onSubmit={handleLogin}
+                      className="space-y-5"
+                      aria-label="Entrar na conta"
+                      aria-busy={busy}
+                    >
+                      <div className="space-y-2">
+                        <Label htmlFor="email-login">E-mail</Label>
+                        <Input
+                          id="email-login"
+                          type="email"
+                          required
+                          autoComplete="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="voce@exemplo.com.br"
+                        />
+                      </div>
+                      <AuthPasswordField id="senha-login" value={senha} onChange={setSenha} />
+                      <div className="flex justify-end">
+                        <button
+                          type="button"
+                          className="min-h-11 rounded-lg text-sm font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          onClick={() => setRecuperar(true)}
+                        >
+                          Esqueci minha senha
+                        </button>
+                      </div>
+                      <Button
+                        type="submit"
+                        className="h-12 w-full rounded-xl font-semibold"
+                        disabled={busy}
+                      >
+                        {busy ? <Loader2 className="size-4 animate-spin" aria-hidden /> : null}
+                        {busy ? "Entrando…" : "Entrar na minha conta"}
+                        {!busy && <ArrowRight aria-hidden />}
+                      </Button>
+                      <p className="text-center text-sm text-muted-foreground">
+                        Ainda não tem conta?{" "}
+                        <button
+                          type="button"
+                          onClick={() => setTab("cadastro")}
+                          className="inline-flex min-h-11 items-center rounded font-semibold text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        >
+                          Comece por aqui
+                        </button>
+                      </p>
+                    </form>
+                  </TabsContent>
+                  <TabsContent value="cadastro">
+                    <form
+                      onSubmit={handleSignUp}
+                      className="space-y-5"
+                      aria-label="Criar conta"
+                      aria-busy={busy}
+                    >
+                      <div className="space-y-2">
+                        <Label htmlFor="nome">Nome completo</Label>
+                        <Input
+                          id="nome"
+                          required
+                          minLength={2}
+                          autoComplete="name"
+                          value={nome}
+                          onChange={(e) => setNome(e.target.value)}
+                          placeholder="Como você se chama?"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="email-signup">E-mail</Label>
+                        <Input
+                          id="email-signup"
+                          type="email"
+                          required
+                          autoComplete="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="voce@exemplo.com.br"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="cpf">CPF</Label>
+                        <Input
+                          id="cpf"
+                          inputMode="numeric"
+                          required
+                          value={cpf}
+                          onChange={(e) => setCpf(mascaraCpf(e.target.value))}
+                          placeholder="000.000.000-00"
+                        />
+                      </div>
+                      <AuthPasswordField
+                        id="senha-signup"
+                        value={senha}
+                        onChange={setSenha}
+                        newPassword
+                      />
+                      <details className="group rounded-xl border border-border p-4">
+                        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-lg text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-details-marker]:hidden">
+                          <span>
+                            Mais sobre você{" "}
+                            <span className="font-normal text-muted-foreground">(opcional)</span>
+                          </span>
+                          <ChevronDown
+                            className="size-4 shrink-0 transition-transform group-open:rotate-180 motion-reduce:transition-none"
+                            aria-hidden
+                          />
+                        </summary>
+                        <div className="mt-4 space-y-5">
+                          <div className="space-y-2">
+                            <Label htmlFor="telefone">Telefone / WhatsApp</Label>
+                            <Input
+                              id="telefone"
+                              type="tel"
+                              inputMode="tel"
+                              autoComplete="tel"
+                              value={telefone}
+                              onChange={(e) => setTelefone(mascaraTelefone(e.target.value))}
+                              placeholder="(11) 99999-9999"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="cnpj">CNPJ</Label>
+                            <Input
+                              id="cnpj"
+                              inputMode="numeric"
+                              value={cnpj}
+                              onChange={(e) => setCnpj(mascaraCnpj(e.target.value))}
+                              placeholder="00.000.000/0000-00"
+                            />
+                          </div>
+                          <LocalFields
+                            uf={uf}
+                            cidade={cidade}
+                            onUfChange={setUf}
+                            onCidadeChange={setCidade}
+                          />
+                        </div>
+                      </details>
+                      {bloqueio && (
+                        <p
+                          role="alert"
+                          className="rounded-xl border border-destructive/25 bg-destructive/5 p-4 text-sm text-destructive"
+                        >
+                          {bloqueio}
+                        </p>
+                      )}
+                      {config?.permitirCadastros !== true && (
+                        <div
+                          role="status"
+                          className="rounded-xl border border-border bg-muted p-4 text-sm text-muted-foreground"
+                        >
+                          {configLoading
+                            ? "Verificando disponibilidade do cadastro…"
+                            : configError
+                              ? "Não foi possível verificar a disponibilidade do cadastro."
+                              : "Novos cadastros estão temporariamente desativados."}
+                          {configError && (
+                            <button
+                              type="button"
+                              onClick={() => void reloadConfig()}
+                              className="mt-2 flex min-h-11 items-center rounded font-semibold text-primary underline"
+                            >
+                              Tentar novamente
+                            </button>
+                          )}
+                        </div>
+                      )}
+                      <Button
+                        type="submit"
+                        className="h-12 w-full rounded-xl font-semibold"
+                        disabled={busy || config?.permitirCadastros !== true}
+                      >
+                        {busy ? <Loader2 className="size-4 animate-spin" aria-hidden /> : null}
+                        {busy ? "Criando sua conta…" : "Criar minha conta"}
+                        {!busy && <ArrowRight aria-hidden />}
+                      </Button>
+                      <p className="text-center text-sm text-muted-foreground">
+                        Já usa o Precifica?{" "}
+                        <button
+                          type="button"
+                          onClick={() => setTab("login")}
+                          className="inline-flex min-h-11 items-center rounded font-semibold text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        >
+                          Entre na sua conta
+                        </button>
+                      </p>
+                    </form>
+                  </TabsContent>
+                </Tabs>
+              )}
+            </div>
+          </div>
+          <p className="text-center text-xs text-muted-foreground">
+            Precifica · Mais clareza para o seu negócio.
+          </p>
+        </main>
       </div>
     </div>
   );
