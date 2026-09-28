@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  MessageCircle,
   Package,
   PanelLeftClose,
   PanelLeftOpen,
@@ -18,7 +19,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useCompany } from "@/lib/app-data";
-import { APP_NAME, APP_SLOGAN } from "@/lib/constants";
+import { APP_NAME, APP_SLOGAN, COMMUNITY_WHATSAPP_URL } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -87,6 +88,21 @@ function NavList({ onNavigate, compact }: { onNavigate?: () => void; compact?: b
           </Link>
         );
       })}
+      <a
+        href={COMMUNITY_WHATSAPP_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={onNavigate}
+        title="Comunidade no WhatsApp (abre em nova aba)"
+        aria-label="Comunidade no WhatsApp (abre em nova aba)"
+        className={cn(
+          "mt-3 flex min-h-11 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+          compact && "justify-center px-2",
+        )}
+      >
+        <MessageCircle className="size-[18px] shrink-0" aria-hidden />
+        {!compact && <span>Comunidade no WhatsApp</span>}
+      </a>
     </nav>
   );
 }

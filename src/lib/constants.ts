@@ -1,5 +1,6 @@
 export const APP_NAME = "Precifica";
 export const APP_SLOGAN = "Lucro certo";
+export const COMMUNITY_WHATSAPP_URL = "https://chat.whatsapp.com/LC9FSUJ1vT8BmyAduGohN4";
 
 export const CATEGORIAS_DESPESA = [
   "aluguel",

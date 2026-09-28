@@ -27,6 +27,7 @@ import {
   YAxis,
 } from "recharts";
 import { AppLayout } from "@/components/app-layout";
+import { CommunityInvite } from "@/components/community-invite";
 import { ClassificacaoBadge, EmptyState, ListSkeleton, StatCard } from "@/components/bits";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -166,6 +167,7 @@ function Painel() {
       }
     >
       <div className="space-y-12">
+        <CommunityInvite />
         <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <StatCard
             label="Faturamento mensal informado"
