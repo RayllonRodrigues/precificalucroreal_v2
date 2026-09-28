@@ -1,0 +1,7 @@
+{
+  "test": "public signup with signup disabled",
+  "createdUser": false,
+  "code": "email_address_invalid",
+  "status": 400,
+  "hookConfigurationConfirmed": false
+}

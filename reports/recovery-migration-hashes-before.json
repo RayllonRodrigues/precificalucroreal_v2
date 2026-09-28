@@ -1,0 +1,22 @@
+﻿[
+    {
+        "Algorithm":  "SHA256",
+        "Hash":  "167D9E409AA1BEC3E0A0B0DB8F278CA163452F620BF75A91C9A096A90C07019C",
+        "Path":  "C:\\Users\\Rayllon\\Documents\\precificalucroreal\\drizzle\\migrations\\0010_harden_tenant_and_payment_security.sql"
+    },
+    {
+        "Algorithm":  "SHA256",
+        "Hash":  "0E48030598F9CE3386A6D4272CEE05AC97D1AA5AD9B85BBFDEF76453ED10D76C",
+        "Path":  "C:\\Users\\Rayllon\\Documents\\precificalucroreal\\drizzle\\migrations\\0011_harden_residual_tenant_and_payment_risks.sql"
+    },
+    {
+        "Algorithm":  "SHA256",
+        "Hash":  "53226F11C94D8991412CF8715ED1CE97CBD7E377717A167148229E5089123720",
+        "Path":  "C:\\Users\\Rayllon\\Documents\\precificalucroreal\\drizzle\\migrations\\0012_production_blockers.sql"
+    },
+    {
+        "Algorithm":  "SHA256",
+        "Hash":  "A5C48F5FC94D900A6F64ACCE1C31168BFB7F3DE8ED87B2A090BE70DB731C19D3",
+        "Path":  "C:\\Users\\Rayllon\\Documents\\precificalucroreal\\drizzle\\migrations\\0013_homologation_read_and_storage_hardening.sql"
+    }
+]

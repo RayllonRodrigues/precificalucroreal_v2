@@ -1,0 +1,17 @@
+{
+  "name": "Precifica — Lucro certo",
+  "short_name": "Precifica",
+  "description": "Precificação inteligente para microempreendedores e pequenos negócios.",
+  "start_url": "/painel",
+  "display": "standalone",
+  "background_color": "#faf9fc",
+  "theme_color": "#7C3AED",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

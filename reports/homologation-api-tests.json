@@ -1,0 +1,55 @@
+[
+  {
+    "test": "Auth admin creation -> profile metadata -> password login",
+    "status": "PASS"
+  },
+  {
+    "test": "profile isolation",
+    "status": "PASS"
+  },
+  {
+    "test": "company RPC + owner membership + persisted trial + payment methods",
+    "status": "PASS"
+  },
+  {
+    "test": "creation atomicity and arbitrary owner rejected",
+    "status": "PASS"
+  },
+  {
+    "test": "cross-tenant isolation via REST and RPC",
+    "status": "PASS"
+  },
+  {
+    "test": "product numeric stock / service null / operational CRUD",
+    "status": "PASS"
+  },
+  {
+    "test": "demo seed/remove atomic RPCs preserve real payment rates and products",
+    "status": "PASS"
+  },
+  {
+    "test": "Storage upload, signed URL, cross-tenant denial, MIME and size",
+    "status": "PASS"
+  },
+  {
+    "test": "active logo protected / cleanup queue idempotent / object removal",
+    "status": "PASS"
+  },
+  {
+    "test": "expired license blocks operational REST and Storage; renewal context remains",
+    "status": "PASS"
+  },
+  {
+    "test": "platform admin identity and server-only atomic deletion",
+    "status": "PASS"
+  },
+  {
+    "test": "Public signup and hosted Auth Hook",
+    "status": "BLOCKED",
+    "detail": "Management API/config permission denied; admin creation is not public signup."
+  },
+  {
+    "test": "synthetic users, companies and objects cleaned",
+    "status": "PASS"
+  }
+]

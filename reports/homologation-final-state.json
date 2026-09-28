@@ -1,0 +1,188 @@
+{
+  "migrations": [
+    {
+      "version": "20260928132125",
+      "name": "initial_precifica_schema_homologation"
+    }
+  ],
+  "tables": [
+    {
+      "tablename": "companies"
+    },
+    {
+      "tablename": "company_members"
+    },
+    {
+      "tablename": "employees"
+    },
+    {
+      "tablename": "expenses"
+    },
+    {
+      "tablename": "license_payments"
+    },
+    {
+      "tablename": "payment_methods"
+    },
+    {
+      "tablename": "platform_admins"
+    },
+    {
+      "tablename": "platform_secrets"
+    },
+    {
+      "tablename": "platform_settings"
+    },
+    {
+      "tablename": "pricing_calculations"
+    },
+    {
+      "tablename": "pricing_scenarios"
+    },
+    {
+      "tablename": "products_services"
+    },
+    {
+      "tablename": "profiles"
+    },
+    {
+      "tablename": "storage_cleanup_jobs"
+    }
+  ],
+  "functions": [
+    {
+      "nspname": "precifica_private",
+      "proname": "create_profile",
+      "prosecdef": true
+    },
+    {
+      "nspname": "precifica_private",
+      "proname": "initialize_company_owner",
+      "prosecdef": true
+    },
+    {
+      "nspname": "precifica_private",
+      "proname": "initialize_trial",
+      "prosecdef": true
+    },
+    {
+      "nspname": "precifica_private",
+      "proname": "protect_company_fields",
+      "prosecdef": false
+    },
+    {
+      "nspname": "precifica_private",
+      "proname": "protect_tenant_reference",
+      "prosecdef": false
+    },
+    {
+      "nspname": "public",
+      "proname": "can_access_logo",
+      "prosecdef": true
+    },
+    {
+      "nspname": "public",
+      "proname": "can_write",
+      "prosecdef": true
+    },
+    {
+      "nspname": "public",
+      "proname": "consume_ai_rate_limit",
+      "prosecdef": false
+    },
+    {
+      "nspname": "public",
+      "proname": "create_company_with_payment_methods",
+      "prosecdef": true
+    },
+    {
+      "nspname": "public",
+      "proname": "delete_company_admin",
+      "prosecdef": true
+    },
+    {
+      "nspname": "public",
+      "proname": "get_my_company_context",
+      "prosecdef": true
+    },
+    {
+      "nspname": "public",
+      "proname": "hook_enforce_signup_enabled",
+      "prosecdef": true
+    },
+    {
+      "nspname": "public",
+      "proname": "is_member",
+      "prosecdef": true
+    },
+    {
+      "nspname": "public",
+      "proname": "is_owner",
+      "prosecdef": true
+    },
+    {
+      "nspname": "public",
+      "proname": "is_platform_admin",
+      "prosecdef": true
+    },
+    {
+      "nspname": "public",
+      "proname": "process_mercado_pago_payment",
+      "prosecdef": true
+    },
+    {
+      "nspname": "public",
+      "proname": "queue_logo_cleanup",
+      "prosecdef": true
+    },
+    {
+      "nspname": "public",
+      "proname": "remove_company_demo",
+      "prosecdef": false
+    },
+    {
+      "nspname": "public",
+      "proname": "seed_company_demo",
+      "prosecdef": false
+    },
+    {
+      "nspname": "public",
+      "proname": "tenant_license_active",
+      "prosecdef": true
+    }
+  ],
+  "counts": [
+    {
+      "auth_users": 0,
+      "companies": 0,
+      "payments": 0,
+      "logo_objects": 0,
+      "cleanup_jobs": 0
+    }
+  ],
+  "settings": [
+    {
+      "permitir_cadastros": false,
+      "permitir_demo": false,
+      "dias_teste": 30
+    }
+  ],
+  "hashes": [
+    {
+      "file": "0010_harden_tenant_and_payment_security.sql",
+      "unchanged": true
+    },
+    {
+      "file": "0011_harden_residual_tenant_and_payment_risks.sql",
+      "unchanged": true
+    },
+    {
+      "file": "0012_production_blockers.sql",
+      "unchanged": true
+    },
+    {
+      "file": "0013_homologation_read_and_storage_hardening.sql",
+      "unchanged": true
+    }
+  ]
+}

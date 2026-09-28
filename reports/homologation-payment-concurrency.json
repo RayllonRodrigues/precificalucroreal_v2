@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "tests": [
+    "concurrent duplicate approval grants once",
+    "payment ID cannot bind another charge",
+    "production/live event rejected",
+    "concurrent reversal applies once",
+    "late approval cannot revive reversed effect",
+    "manual/overlapping grant protected from automatic reversal"
+  ],
+  "syntheticDataRemoved": true
+}

@@ -1,0 +1,43 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "../src/integrations/supabase/types";
+import { companyOperations } from "../src/lib/demo-operations";
+import { buildDemoPayload } from "../src/lib/demo-data";
+
+test("demo examples keep existing values and calculations reference newly inserted IDs", () => {
+  const payload = buildDemoPayload("tenant");
+  assert.equal(payload.products.length, 4);
+  assert.equal(payload.expenses.length, 3);
+  assert.equal(payload.employees.length, 2);
+  assert.equal(payload.products[0]?.custo_aquisicao, 6.4);
+  const ids = new Set(payload.products.map((p) => p.id));
+  for (const calc of payload.calculations) {
+    assert.ok(ids.has(calc.item_id));
+    assert.ok(Number.isFinite(calc.preco_sugerido));
+    assert.equal(calc.is_demo, true);
+  }
+  assert.equal(
+    payload.payments.every((p) => p.is_demo && p.company_id === "tenant"),
+    true,
+  );
+});
+test("creation, demo seed and removal propagate errors without fallback writes or false success", async () => {
+  const calls: string[] = [];
+  const error = new Error("database denied operation");
+  const client = {
+    rpc: async (name: string) => {
+      calls.push(name);
+      return { data: null, error };
+    },
+  } as unknown as SupabaseClient<Database>;
+  const ops = companyOperations(client);
+  await assert.rejects(ops.create({ nome: "Empresa" }), /database denied/);
+  await assert.rejects(ops.seed("tenant"), /database denied/);
+  await assert.rejects(ops.remove("tenant"), /database denied/);
+  assert.deepEqual(calls, [
+    "create_company_with_payment_methods",
+    "seed_company_demo",
+    "remove_company_demo",
+  ]);
+});

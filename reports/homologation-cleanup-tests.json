@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "tests": [
+    "removal failure -> actual queue RPC -> failed retry retained",
+    "successful retry removes object/job; repeated run is harmless",
+    "object already removed before commit is safely retried",
+    "active logo never removed; later replacement allows cleanup",
+    "two workers process one job safely",
+    "invalid bucket/path rejected"
+  ],
+  "syntheticDataRemoved": true,
+  "scheduler": "PENDING"
+}

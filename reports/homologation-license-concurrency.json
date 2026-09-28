@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "tests": [
+    "payment-between-read-and-write",
+    "manual-first",
+    "concurrent-three"
+  ],
+  "syntheticDataRemoved": true
+}

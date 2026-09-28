@@ -1,0 +1,5 @@
+project_id = "adkfebcanubebtmqyram"
+
+[auth.hook.before_user_created]
+enabled = true
+uri = "pg-functions://postgres/public/hook_enforce_signup_enabled"

@@ -1,0 +1,236 @@
+{
+  "schemas": [
+    {
+      "nspname": "information_schema"
+    },
+    {
+      "nspname": "realtime"
+    },
+    {
+      "nspname": "public"
+    },
+    {
+      "nspname": "extensions"
+    },
+    {
+      "nspname": "vault"
+    },
+    {
+      "nspname": "graphql_public"
+    },
+    {
+      "nspname": "graphql"
+    },
+    {
+      "nspname": "auth"
+    },
+    {
+      "nspname": "storage"
+    }
+  ],
+  "relations": [
+    {
+      "schemaname": "auth",
+      "tablename": "saml_relay_states",
+      "rowsecurity": true
+    },
+    {
+      "schemaname": "auth",
+      "tablename": "flow_state",
+      "rowsecurity": true
+    },
+    {
+      "schemaname": "auth",
+      "tablename": "saml_providers",
+      "rowsecurity": true
+    },
+    {
+      "schemaname": "auth",
+      "tablename": "instances",
+      "rowsecurity": true
+    },
+    {
+      "schemaname": "auth",
+      "tablename": "schema_migrations",
+      "rowsecurity": true
+    },
+    {
+      "schemaname": "auth",
+      "tablename": "refresh_tokens",
+      "rowsecurity": true
+    },
+    {
+      "schemaname": "vault",
+      "tablename": "secrets",
+      "rowsecurity": false
+    },
+    {
+      "schemaname": "auth",
+      "tablename": "users",
+      "rowsecurity": true
+    },
+    {
+      "schemaname": "auth",
+      "tablename": "audit_log_entries",
+      "rowsecurity": true
+    },
+    {
+      "schemaname": "auth",
+      "tablename": "sso_domains",
+      "rowsecurity": true
+    },
+    {
+      "schemaname": "auth",
+      "tablename": "mfa_amr_claims",
+      "rowsecurity": true
+    },
+    {
+      "schemaname": "auth",
+      "tablename": "identities",
+      "rowsecurity": true
+    },
+    {
+      "schemaname": "auth",
+      "tablename": "sessions",
+      "rowsecurity": true
+    },
+    {
+      "schemaname": "auth",
+      "tablename": "mfa_challenges",
+      "rowsecurity": true
+    },
+    {
+      "schemaname": "auth",
+      "tablename": "sso_providers",
+      "rowsecurity": true
+    },
+    {
+      "schemaname": "auth",
+      "tablename": "mfa_factors",
+      "rowsecurity": true
+    },
+    {
+      "schemaname": "auth",
+      "tablename": "one_time_tokens",
+      "rowsecurity": true
+    },
+    {
+      "schemaname": "auth",
+      "tablename": "oauth_consents",
+      "rowsecurity": false
+    },
+    {
+      "schemaname": "auth",
+      "tablename": "oauth_authorizations",
+      "rowsecurity": false
+    },
+    {
+      "schemaname": "auth",
+      "tablename": "oauth_client_states",
+      "rowsecurity": false
+    },
+    {
+      "schemaname": "auth",
+      "tablename": "oauth_clients",
+      "rowsecurity": false
+    },
+    {
+      "schemaname": "auth",
+      "tablename": "custom_oauth_providers",
+      "rowsecurity": false
+    },
+    {
+      "schemaname": "auth",
+      "tablename": "webauthn_credentials",
+      "rowsecurity": false
+    },
+    {
+      "schemaname": "realtime",
+      "tablename": "schema_migrations",
+      "rowsecurity": false
+    },
+    {
+      "schemaname": "auth",
+      "tablename": "webauthn_challenges",
+      "rowsecurity": false
+    },
+    {
+      "schemaname": "auth",
+      "tablename": "scim_users",
+      "rowsecurity": false
+    },
+    {
+      "schemaname": "auth",
+      "tablename": "scim_tokens",
+      "rowsecurity": false
+    },
+    {
+      "schemaname": "auth",
+      "tablename": "mfa_recovery_code_sets",
+      "rowsecurity": false
+    },
+    {
+      "schemaname": "auth",
+      "tablename": "mfa_recovery_codes",
+      "rowsecurity": false
+    },
+    {
+      "schemaname": "realtime",
+      "tablename": "messages",
+      "rowsecurity": true
+    },
+    {
+      "schemaname": "realtime",
+      "tablename": "subscription",
+      "rowsecurity": false
+    },
+    {
+      "schemaname": "storage",
+      "tablename": "migrations",
+      "rowsecurity": true
+    },
+    {
+      "schemaname": "storage",
+      "tablename": "s3_multipart_uploads_parts",
+      "rowsecurity": true
+    },
+    {
+      "schemaname": "storage",
+      "tablename": "s3_multipart_uploads",
+      "rowsecurity": true
+    },
+    {
+      "schemaname": "storage",
+      "tablename": "buckets_vectors",
+      "rowsecurity": true
+    },
+    {
+      "schemaname": "storage",
+      "tablename": "vector_indexes",
+      "rowsecurity": true
+    },
+    {
+      "schemaname": "storage",
+      "tablename": "buckets_analytics",
+      "rowsecurity": true
+    },
+    {
+      "schemaname": "storage",
+      "tablename": "objects",
+      "rowsecurity": true
+    },
+    {
+      "schemaname": "storage",
+      "tablename": "buckets",
+      "rowsecurity": true
+    }
+  ],
+  "authUsers": [
+    {
+      "count": 0
+    }
+  ],
+  "buckets": [],
+  "triggers": [],
+  "functions": []
+}

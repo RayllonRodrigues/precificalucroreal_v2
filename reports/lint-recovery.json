@@ -1,0 +1,305 @@
+{
+  "errors": 42,
+  "warnings": 7,
+  "rules": {
+    "prettier/prettier": 42,
+    "react-refresh/only-export-components": 4,
+    "react-hooks/exhaustive-deps": 3
+  },
+  "findings": [
+    {
+      "file": "src\\components\\admin-layout.tsx",
+      "line": 128,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\components\\bits.tsx",
+      "line": 39,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\components\\bits.tsx",
+      "line": 90,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\components\\ui\\badge.tsx",
+      "line": 33,
+      "rule": "react-refresh/only-export-components",
+      "severity": 1
+    },
+    {
+      "file": "src\\components\\ui\\button.tsx",
+      "line": 50,
+      "rule": "react-refresh/only-export-components",
+      "severity": 1
+    },
+    {
+      "file": "src\\hooks\\useAuth.tsx",
+      "line": 52,
+      "rule": "react-refresh/only-export-components",
+      "severity": 1
+    },
+    {
+      "file": "src\\lib\\auth-messages.ts",
+      "line": 12,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\lib\\auth-messages.ts",
+      "line": 17,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\lib\\auth-messages.ts",
+      "line": 22,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\lib\\auth-messages.ts",
+      "line": 24,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\lib\\auth-messages.ts",
+      "line": 33,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\lib\\auth-messages.ts",
+      "line": 42,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\despesas.tsx",
+      "line": 209,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\despesas.tsx",
+      "line": 277,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\despesas.tsx",
+      "line": 293,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\despesas.tsx",
+      "line": 428,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\equipe.tsx",
+      "line": 149,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\equipe.tsx",
+      "line": 155,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\equipe.tsx",
+      "line": 352,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\historico.tsx",
+      "line": 156,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\historico.tsx",
+      "line": 159,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\historico.tsx",
+      "line": 163,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\historico.tsx",
+      "line": 204,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\historico.tsx",
+      "line": 205,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\historico.tsx",
+      "line": 217,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\index.tsx",
+      "line": 404,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\index.tsx",
+      "line": 477,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\itens.tsx",
+      "line": 3,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\itens.tsx",
+      "line": 111,
+      "rule": "react-refresh/only-export-components",
+      "severity": 1
+    },
+    {
+      "file": "src\\routes\\itens.tsx",
+      "line": 154,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\itens.tsx",
+      "line": 605,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\painel.tsx",
+      "line": 301,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\painel.tsx",
+      "line": 357,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\painel.tsx",
+      "line": 426,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\relatorios.tsx",
+      "line": 67,
+      "rule": "react-hooks/exhaustive-deps",
+      "severity": 1
+    },
+    {
+      "file": "src\\routes\\relatorios.tsx",
+      "line": 67,
+      "rule": "react-hooks/exhaustive-deps",
+      "severity": 1
+    },
+    {
+      "file": "src\\routes\\relatorios.tsx",
+      "line": 67,
+      "rule": "react-hooks/exhaustive-deps",
+      "severity": 1
+    },
+    {
+      "file": "src\\routes\\relatorios.tsx",
+      "line": 116,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\relatorios.tsx",
+      "line": 225,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\relatorios.tsx",
+      "line": 236,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\relatorios.tsx",
+      "line": 260,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\relatorios.tsx",
+      "line": 265,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\relatorios.tsx",
+      "line": 284,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\relatorios.tsx",
+      "line": 346,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\simulador.tsx",
+      "line": 4,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\simulador.tsx",
+      "line": 80,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\simulador.tsx",
+      "line": 134,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\simulador.tsx",
+      "line": 280,
+      "rule": "prettier/prettier",
+      "severity": 2
+    },
+    {
+      "file": "src\\routes\\simulador.tsx",
+      "line": 299,
+      "rule": "prettier/prettier",
+      "severity": 2
+    }
+  ]
+}

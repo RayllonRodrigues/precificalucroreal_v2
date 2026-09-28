@@ -1,0 +1,6 @@
+{"_tag":"Error","error":{"code":"DbPushApplyError","message":"ERROR: Explicit homologation target required (SQLSTATE P0001)\nAt statement: 0\n-- NEW HOMOLOGATION BASELINE. Not recovered production history.\n-- Target: adkfebcanubebtmqyram. Never apply to bjtyeikuomxudmtdxtrp.\n-- Column contract: current application/types; defaults below are NEW explicit decisions.\n-- Reviewed security adapters from recovery files; those files remain untouched.\n-- AI remains fail-closed pending an approved quota/reset contract.\nDO $$ BEGIN\n IF current_setting('precifica.homologation_project',true) IS DISTINCT FROM 'adkfebcanubebtmqyram' THEN\n  RAISE EXCEPTION 'Explicit homologation target required';\n END IF;\n IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public') THEN\n  RAISE EXCEPTION 'Baseline requires empty public schema; inspect existing structures first';\n END IF;\nEND $$"}}
+Connecting to remote database...
+Do you want to push these migrations to the remote database?
+ • 20260928132125_initial_precifica_schema_homologation.sql
+ [Y/n] y
+Applying migration 20260928132125_initial_precifica_schema_homologation.sql...

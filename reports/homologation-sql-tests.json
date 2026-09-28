@@ -1,0 +1,22 @@
+[
+  {
+    "file": "tests/tenant-isolation.sql",
+    "result": "PASS",
+    "rolledBack": true
+  },
+  {
+    "file": "tests/payment-idempotency.sql",
+    "result": "PASS",
+    "rolledBack": true
+  },
+  {
+    "file": "tests/homologation-contract.sql",
+    "result": "PASS",
+    "rolledBack": true
+  },
+  {
+    "file": "tests/license-and-ai-rls.sql",
+    "result": "BLOCKED",
+    "reason": "Five-call quota/reset not approved; license/RLS assertions covered separately."
+  }
+]
